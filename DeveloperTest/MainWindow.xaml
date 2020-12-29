@@ -1,0 +1,165 @@
+﻿<Window x:Class="DeveloperTest.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"        
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"   
+        xmlns:commonPathData="clr-namespace:CommonPathAndData;assembly=CommonPathAndData"
+        xmlns:rule="clr-namespace:DeveloperTest.ValidationRules"
+        xmlns:behaviors="clr-namespace:DeveloperTest.Views.Behaviors"
+        Title="Mail Fetcher" Height="740" Width="1297"
+        DataContext="{Binding Main, Source={StaticResource Locator}}">
+    <!--
+    ToDo:Remove Later
+        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"-->
+    <Window.Resources>
+        <ObjectDataProvider x:Key="serverType" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">            
+            <ObjectDataProvider.MethodParameters>               
+                <x:Type TypeName="commonPathData:ServerType"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="encryptionType" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="commonPathData:EncryptionType"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </Window.Resources>
+    <Grid>
+        <DataGrid VerticalAlignment="Top" Height="554" Margin="10,146,0,0" HorizontalAlignment="Left" Width="632" 
+                  ItemsSource="{Binding Emails}"
+                  CanUserAddRows="False"
+                  AutoGenerateColumns="False"
+                  SelectedItem="{Binding SelectedEmail, UpdateSourceTrigger=PropertyChanged}"
+                  >
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction Command="{Binding DataContext.ShowEmailBody, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}"/>
+                </i:EventTrigger> 
+            </i:Interaction.Triggers>
+            <DataGrid.Columns>
+            <DataGridTextColumn 
+                    Header="From" 
+                    Binding="{Binding From}"
+                    IsReadOnly="True"/>
+            <DataGridTextColumn 
+                    Header="Subject" 
+                    Binding="{Binding Subject}"
+                    IsReadOnly="True"/>
+            <DataGridTextColumn 
+                    Header="Date" 
+                    Binding="{Binding Date}"
+                    IsReadOnly="True">
+                <DataGridTextColumn.CellStyle>
+                    <Style>
+                        <Setter Property="FrameworkElement.HorizontalAlignment" Value="Right"/>
+                    </Style>
+                </DataGridTextColumn.CellStyle>
+            </DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <TextBox x:Name="txtServerName" HorizontalAlignment="Left" Height="23" Margin="98,41,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="190" 
+                 Validation.ErrorTemplate="{StaticResource ControlErrorTemplate}"
+                 Style="{StaticResource ControlErrorStyle}"
+                 IsEnabled="{Binding EnableControl}">
+            <TextBox.Text>
+                <Binding Path="ServerName" UpdateSourceTrigger="PropertyChanged">
+                    <Binding.ValidationRules>
+                        <rule:RequiredFieldRule ValidatesOnTargetUpdated="True"/>
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox.Text>
+        </TextBox>
+        <Label Content="Server" HorizontalAlignment="Left" Margin="10,37,0,0" VerticalAlignment="Top"/>
+        <Label Content="Port" HorizontalAlignment="Left" Margin="10,65,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="txtPort" HorizontalAlignment="Left" Height="23" Margin="98,69,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="190"
+                 Validation.ErrorTemplate="{StaticResource ControlErrorTemplate}"
+                 Style="{StaticResource ControlErrorStyle}"
+                 IsEnabled="{Binding EnableControl}">
+            <TextBox.Text>
+                <Binding Path="PortNumber" UpdateSourceTrigger="PropertyChanged">
+                    <Binding.ValidationRules>
+                        <rule:RequiredFieldRule ValidatesOnTargetUpdated="True"/>
+                        <rule:UnsignedShortNumberRule ValidatesOnTargetUpdated="True"/>
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox.Text>            
+        </TextBox>
+        <Label Content="Encryption" HorizontalAlignment="Left" Margin="323,7,0,0" VerticalAlignment="Top"/>
+        <ComboBox HorizontalAlignment="Left" Margin="411,10,0,0" VerticalAlignment="Top" Width="190" 
+                  ItemsSource="{Binding Source={StaticResource encryptionType}}"
+                  SelectedValue="{Binding SelectedEncryptionType}"
+                  IsEnabled="{Binding EnableControl}"/>
+        <Label Content="Username" HorizontalAlignment="Left" Margin="323,38,0,0" VerticalAlignment="Top"/>
+        <Label Content="Password" HorizontalAlignment="Left" Margin="323,69,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="txtUserName" HorizontalAlignment="Left" Height="23" Margin="411,42,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="190"
+                 Validation.ErrorTemplate="{StaticResource ControlErrorTemplate}"
+                 Style="{StaticResource ControlErrorStyle}"
+                 IsEnabled="{Binding EnableControl}">
+            <TextBox.Text>
+                <Binding Path="CurrentUser.Username" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                    <Binding.ValidationRules>
+                        <rule:RequiredFieldRule ValidatesOnTargetUpdated="True"/>
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox.Text>
+        </TextBox>
+        <PasswordBox x:Name="txtPassword" HorizontalAlignment="Left" Height="23" Margin="411,73,0,0" VerticalAlignment="Top" Width="190"
+                 Validation.ErrorTemplate="{StaticResource ControlErrorTemplate}"
+                 Style="{StaticResource ControlErrorStyle}"
+                 PasswordChanged="PasswordBox_PasswordChanged"
+                 IsEnabled="{Binding EnableControl}"
+                 >            
+            <PasswordBox.Tag>
+                <Binding  Mode="OneWay" Path="CurrentUser.Password" UpdateSourceTrigger="PropertyChanged">
+                    <Binding.ValidationRules>
+                        <rule:RequiredFieldRule ValidatesOnTargetUpdated="True"/>
+                    </Binding.ValidationRules>
+                </Binding>
+            </PasswordBox.Tag>        
+        </PasswordBox>
+        <Button Content="{Binding ButtonContent}" HorizontalAlignment="Left" Margin="446,104,0,0" VerticalAlignment="Top" Width="155" Height="36" Command="{Binding StartMailFetching}"
+               >
+            <Button.Style>
+                <Style>                    
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding ElementName=txtUserName,Path=(Validation.HasError)}" Value="true"/>                              
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Button.IsEnabled" Value="False"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding ElementName=txtPassword,Path=(Validation.HasError)}" Value="true"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Button.IsEnabled" Value="False"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding ElementName=txtServerName,Path=(Validation.HasError)}" Value="true"/>                                
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Button.IsEnabled" Value="False"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding ElementName=txtPort,Path=(Validation.HasError)}" Value="true"/>                                
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Button.IsEnabled" Value="False"/>
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>                
+            </Button.Style>
+        </Button>
+        <Label Content="Server type" HorizontalAlignment="Left" Margin="10,7,0,0" VerticalAlignment="Top"/>
+        <ComboBox HorizontalAlignment="Left" Margin="98,10,0,0" VerticalAlignment="Top" Width="190" 
+                  ItemsSource="{Binding Source={StaticResource serverType}}"
+                  IsEnabled="{Binding EnableControl}">
+            <ComboBox.Text>
+                <Binding Path="SelectedServerType"/>
+            </ComboBox.Text>
+        </ComboBox>
+        <TextBlock HorizontalAlignment="Left" Height="690" Margin="647,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="632">
+            <WebBrowser behaviors:RichTextBehavior.RichText="{Binding BodyHtml}"/>
+        </TextBlock>
+
+    </Grid>
+</Window>

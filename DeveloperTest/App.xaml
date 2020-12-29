@@ -1,0 +1,30 @@
+<Application x:Class="DeveloperTest.App" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+             StartupUri="MainWindow.xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             d1p1:Ignorable="d" 
+             xmlns:d1p1="http://schemas.openxmlformats.org/markup-compatibility/2006">
+  <Application.Resources>
+    <ResourceDictionary>
+            <viewmodel:ViewModelLocator x:Key="Locator" d:IsDataSource="True" xmlns:viewmodel="clr-namespace:DeveloperTest.ViewModel" />
+            <Style x:Key="ControlErrorStyle" TargetType="Control">
+                <Style.Triggers>
+                    <Trigger Property="Validation.HasError" Value="True">
+                        <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self},
+                                                          Path=(Validation.Errors)[0].ErrorContent}"/>
+                        <Setter Property="Background" Value="LightYellow"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <ControlTemplate x:Key="ControlErrorTemplate">
+                <DockPanel>
+                    <TextBlock Foreground="Red" FontSize="20" 
+                               Visibility="{Binding ElementName=placeHolder,Path=AdornedElement.Visibility}">*</TextBlock>
+                    <!--<TextBlock Text="{Binding [0].ErrorContent}" DockPanel.Dock="Bottom" Foreground="Red" Width="250"
+                               TextWrapping="Wrap"
+                               Visibility="{Binding ElementName=placeHolder,Path=AdornedElement.Visibility}"></TextBlock>-->
+                    <AdornedElementPlaceholder x:Name="placeHolder"/>
+                </DockPanel>
+            </ControlTemplate>
+    </ResourceDictionary>
+  </Application.Resources>
+</Application>
